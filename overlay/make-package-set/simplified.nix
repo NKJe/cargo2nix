@@ -6,6 +6,7 @@
 }:
 args@{
   rustChannel,
+  rustSha256 ? null,
   packageFun,
   packageOverrides ? pkgs: pkgs.rustBuilder.overrides.all,
   ...
@@ -13,6 +14,7 @@ args@{
 let
   rustChannel = buildPackages.rustChannelOf {
     channel = args.rustChannel;
+    sha256 = args.rustSha256;
   };
   inherit (rustChannel) cargo;
   rustc = rustChannel.rust.override {
@@ -20,7 +22,7 @@ let
       (rustBuilder.rustLib.realHostTriple stdenv.targetPlatform)
     ];
   };
-  extraArgs = builtins.removeAttrs args [ "rustChannel" "packageFun" "packageOverrides" ];
+  extraArgs = builtins.removeAttrs args [ "rustChannel" "rustSha256" "packageFun" "packageOverrides" ];
 in
 rustBuilder.makePackageSet (extraArgs // {
   inherit cargo rustc packageFun;
